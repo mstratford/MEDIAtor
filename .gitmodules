@@ -1,0 +1,3 @@
+[submodule "libs/simpleobsws"]
+	path = libs/simpleobsws
+	url = https://github.com/IRLToolkit/simpleobsws.git

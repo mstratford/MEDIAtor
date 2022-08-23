@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Optional
 from numbers import Number
+from urllib import response
 from .common import make_request
 from .scenes import Scene
 from time import sleep
@@ -28,7 +29,6 @@ class InputKind(Enum):
 
 
 
-#{'sceneIndex': 0, 'sceneName': 'Scene 3'}
 class Input(object):
   data: dict
 
@@ -55,4 +55,15 @@ async def create_input(name: str, scene: Scene, kind: InputKind, settings: dict)
   params = { "inputName": name, "sceneName": scene.name, "inputKind": kind.value, "inputSettings": settings}
   await make_request("CreateInput", params)
 
+
+async def get_inputs(kind: Optional[InputKind] = None):
+  params = {}
+  if kind:
+    params["inputKind"] = kind
+  response = await make_request("GetInputList", params)
+
+  if "inputs" in response:
+    return response["inputs"]
+
+  return []
 

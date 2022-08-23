@@ -1,5 +1,6 @@
 # MEDIAtor
 .obs-config.json
+mediator/tools/outputs/*.json
 
 
 # Byte-compiled / optimized / DLL files

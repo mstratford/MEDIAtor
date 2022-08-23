@@ -1,5 +1,5 @@
 import asyncio
-from obs_wrapper import projectors, scenes, sources
+from obs_wrapper import projectors, scenes, inputs
 from time import sleep
 import pathlib
 # The MEDIAtor main server.
@@ -20,9 +20,9 @@ class MEDIAtor():
     wallpaper = file_dir + "wallpaper.jpg"
     logo = file_dir + "logo.png"
     for scene in new_scenes:
-      await sources.create_input("background"+scene.name, scene, sources.InputKind.IMAGE, {"file": wallpaper})
-      await sources.create_input("logo"+scene.name, scene, sources.InputKind.IMAGE, {"file": logo})
-      await sources.create_input("text"+scene.name, scene, sources.InputKind.TEXT, {"text": "Display " + scene.name})
+      await inputs.create_input("background"+scene.name, scene, inputs.InputKind.IMAGE, {"file": wallpaper})
+      await inputs.create_input("logo"+scene.name, scene, inputs.InputKind.IMAGE, {"file": logo})
+      await inputs.create_input("text"+scene.name, scene, inputs.InputKind.TEXT, {"text": "Display " + scene.name})
 
     sceneList = new_scenes #await scenes.get_scene_list()
 

@@ -1,8 +1,6 @@
-from typing import List, Optional
+from typing import List
 from numbers import Number
-from obs_wrapper import scenes
-
-from obs_wrapper.scenes import Scene
+from . import scenes
 from .common import make_request\
 
 # {'monitors': [{'monitorHeight': 1692, 'monitorIndex': 0, 'monitorName': 'ASUS PB287Q(0)', 'monitorPositionX': 0, 'monitorPositionY': 0, 'monitorWidth': 3008}, {'monitorHeight': 1200, 'monitorIndex': 1, 'monitorName': 'Color LCD(1)', 'monitorPositionX': -1920, 'monitorPositionY': 492, 'monitorWidth': 1920}, {'monitorHeight': 1692, 'monitorIndex': 2, 'monitorName': 'ASUS MG28U(2)', 'monitorPositionX': 3008, 'monitorPositionY': 0, 'monitorWidth': 3008}]}
@@ -50,7 +48,7 @@ async def get_monitor_list() -> List[Monitor]:
   return monitors
 
 # TODO Return bool
-async def open_source_projector(source: Scene, monitor: Monitor):
+async def open_source_projector(source: scenes.Scene, monitor: Monitor):
   await make_request("OpenSourceProjector", {"sourceName": source.name, "monitorIndex": monitor.index })
 
 

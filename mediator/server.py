@@ -1,5 +1,5 @@
 import asyncio
-from obs_wrapper import projectors, scenes, inputs
+from .obs_wrapper import projectors, scenes, inputs
 from time import sleep
 import pathlib
 # The MEDIAtor main server.
@@ -16,7 +16,7 @@ class MEDIAtor():
 
       new_scenes.append(await scenes.create_scene("Demo "+str(i), ignore_exits=True))
 
-    file_dir=str(pathlib.Path(__file__).parent.resolve()) + "/assets/images/"
+    file_dir=str(pathlib.Path(__file__).parent.resolve()) + "/../assets/images/"
     wallpaper = file_dir + "wallpaper.jpg"
     logo = file_dir + "logo.png"
     for scene in new_scenes:

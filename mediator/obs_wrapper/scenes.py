@@ -1,9 +1,8 @@
 import json
 from typing import List, Optional
 from numbers import Number
-from .common import make_request
+from . import common
 from time import sleep
-
 
 #{'sceneIndex': 0, 'sceneName': 'Scene 3'}
 class Scene(object):
@@ -11,6 +10,10 @@ class Scene(object):
 
   def __init__(self, data: dict):
     self.data = data
+
+  async def delete(self):
+    await remove_scene(self)
+    del self
 
   @property
   def name(self) -> str:
@@ -35,7 +38,7 @@ class Scene(object):
     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=2)
 
 async def get_scene_list() -> List[Scene]:
-  response = await make_request("GetSceneList")
+  response = await common.connection.make_request("GetSceneList")
   scenes = []
   if "scenes" in response:
     for scene in response["scenes"]:
@@ -57,8 +60,8 @@ async def create_scene(name: str, ignore_exits: bool = False) -> Scene:
         return scene # Return existing scene
       raise Exception("Scene already exists!")
 
-  await make_request("CreateScene", { "sceneName": name })
-  for i in range(10):
+  await common.connection.make_request("CreateScene", { "sceneName": name })
+  for i in range(50):
     scenes = await get_scene_list()
     for scene in scenes:
       if scene.name == name:
@@ -67,7 +70,7 @@ async def create_scene(name: str, ignore_exits: bool = False) -> Scene:
   raise Exception("No scene was seen after creating it.")
 
 async def remove_scene(scene_to_remove: Scene):
-  await make_request("RemoveScene", { "sceneName": scene_to_remove.name })
+  await common.connection.make_request("RemoveScene", { "sceneName": scene_to_remove.name })
   found = False
   for i in range(4):
     scenes = await get_scene_list()

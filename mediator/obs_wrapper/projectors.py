@@ -1,7 +1,7 @@
 from typing import List
 from numbers import Number
 from . import scenes
-from .common import make_request\
+from . import common
 
 # {'monitors': [{'monitorHeight': 1692, 'monitorIndex': 0, 'monitorName': 'ASUS PB287Q(0)', 'monitorPositionX': 0, 'monitorPositionY': 0, 'monitorWidth': 3008}, {'monitorHeight': 1200, 'monitorIndex': 1, 'monitorName': 'Color LCD(1)', 'monitorPositionX': -1920, 'monitorPositionY': 492, 'monitorWidth': 1920}, {'monitorHeight': 1692, 'monitorIndex': 2, 'monitorName': 'ASUS MG28U(2)', 'monitorPositionX': 3008, 'monitorPositionY': 0, 'monitorWidth': 3008}]}
 class Monitor(object):
@@ -39,7 +39,7 @@ class Monitor(object):
     return "Monitor: Name: " + self.name
 
 async def get_monitor_list() -> List[Monitor]:
-  response = await make_request("GetMonitorList")
+  response = await common.connection.make_request("GetMonitorList")
   monitors = []
   if "monitors" in response:
     for monitor in response["monitors"]:
@@ -49,7 +49,7 @@ async def get_monitor_list() -> List[Monitor]:
 
 # TODO Return bool
 async def open_source_projector(source: scenes.Scene, monitor: Monitor):
-  await make_request("OpenSourceProjector", {"sourceName": source.name, "monitorIndex": monitor.index })
+  await common.connection.make_request("OpenSourceProjector", {"sourceName": source.name, "monitorIndex": monitor.index })
 
 
 # Kind of a hack, OBS API doesn't let you close the projector.

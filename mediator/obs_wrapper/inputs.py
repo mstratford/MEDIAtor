@@ -1,11 +1,8 @@
 from typing import List, Optional
-from numbers import Number
-from urllib import response
-from .common import make_request
 from .scenes import Scene
 from time import sleep
 from enum import Enum
-
+from . import common
 # 'inputKinds': ['image_source', 'color_source_v3', 'slideshow', 'av_capture_input_v2', 'coreaudio_input_capture', 'coreaudio_output_capture',
 # 'screen_capture', 'display_capture', 'window_capture', 'syphon-input', 'browser_source', 'ffmpeg_source', 'text_ft2_source_v2', 'vlc_source']}
 
@@ -53,14 +50,14 @@ class Input(object):
 
 async def create_input(name: str, scene: Scene, kind: InputKind, settings: dict) -> Input:
   params = { "inputName": name, "sceneName": scene.name, "inputKind": kind.value, "inputSettings": settings}
-  await make_request("CreateInput", params)
+  await common.connection.make_request("CreateInput", params)
 
 
 async def get_inputs(kind: Optional[InputKind] = None):
   params = {}
   if kind:
     params["inputKind"] = kind
-  response = await make_request("GetInputList", params)
+  response = await common.connection.make_request("GetInputList", params)
 
   if "inputs" in response:
     return response["inputs"]

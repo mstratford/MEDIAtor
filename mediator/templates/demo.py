@@ -30,7 +30,7 @@ class Demo(Template):
 
     if not self._scene:
 
-      scene = await scenes.create_scene("Demo "+str(self.display_number), ignore_exits=True)
+      scene = await scenes.create_scene("Demo "+str(self.display_number), ignore_exists=True)
 
       file_dir=str(pathlib.Path(__file__).parent.resolve()) + "/../../assets/images/"
       wallpaper = file_dir + "wallpaper.jpg"

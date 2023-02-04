@@ -52,16 +52,16 @@ async def get_scene(name: str) -> Optional[Scene]:
     if scene.name == name:
       return scene
 
-async def create_scene(name: str, ignore_exits: bool = False) -> Scene:
+async def create_scene(name: str, ignore_exists: bool = False) -> Scene:
   scenes = await get_scene_list()
   for scene in scenes:
     if scene.name == name:
-      if ignore_exits:
+      if ignore_exists:
         return scene # Return existing scene
       raise Exception("Scene already exists!")
 
   await common.connection.make_request("CreateScene", { "sceneName": name })
-  for i in range(50):
+  for i in range(20):
     scenes = await get_scene_list()
     for scene in scenes:
       if scene.name == name:

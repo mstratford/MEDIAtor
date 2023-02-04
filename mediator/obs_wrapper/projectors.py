@@ -57,7 +57,7 @@ async def close_projector(monitor: Monitor):
   if not monitor:
     raise Exception("No monitor provided.")
 
-  temp_scene = await scenes.create_scene("temp-RemoveProjector", ignore_exits=True)
+  temp_scene = await scenes.create_scene("temp-RemoveProjector", ignore_exists=True)
   # Because we've set only one full screen projector per monitor (@TODO Actually set this automatically!),
   # we can replace it with another projector, then delete the scene. This will close the projector window.
   await open_source_projector(temp_scene, monitor)

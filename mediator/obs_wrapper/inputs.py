@@ -49,7 +49,7 @@ class Input(object):
     return "Input: Name: " + self.name
 
 async def create_input(name: str, scene: Scene, kind: InputKind, settings: dict) -> Input:
-  params = { "inputName": name, "sceneName": scene.name, "inputKind": kind.value, "inputSettings": settings}
+  params = { "inputName": f'{scene.name}-{name}', "sceneName": scene.name, "inputKind": kind.value, "inputSettings": settings}
   await common.connection.make_request("CreateInput", params)
 
 

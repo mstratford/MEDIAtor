@@ -87,3 +87,11 @@ async def remove_scene(scene_to_remove: Scene):
   if found:
     raise Exception("Failed to remove scene, it still exists!")
 
+async def remove_all_scenes():
+  # You can't have 0 scenes, so create an empty one before removing the rest.
+  await create_scene("Empty", ignore_exists=True)
+  scenes = await get_scene_list()
+
+  for scene in scenes:
+    if scene.name != "Empty":
+      await remove_scene(scene)

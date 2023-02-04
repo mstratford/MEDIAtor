@@ -1,5 +1,5 @@
 import asyncio
-from .obs_wrapper import projectors
+from .obs_wrapper import projectors, scenes
 from time import sleep
 from .templates import demo
 from .obs_wrapper import common
@@ -17,6 +17,8 @@ class MEDIAtor():
 
   async def do_demo(self):
     monitors = await projectors.get_monitor_list()
+
+    await scenes.remove_all_scenes()
 
     new_scenes = []
     for i in range(len(monitors)):

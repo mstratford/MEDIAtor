@@ -17,19 +17,18 @@ class MEDIAtor():
 
   async def do_demo(self):
     monitors = await projectors.get_monitor_list()
-
+    monitors=monitors[1:2]
     await scenes.remove_all_scenes()
 
     new_scenes = []
-    for i in range(len(monitors)):
+    for monitor in monitors:
 
-      template = demo.Demo({'name': f"Demo Display {i}", 'display_number': i})
+      template = demo.Demo({'name': f"Demo Display {monitor.index}", 'display_number': monitor.index})
 
       new_scenes.append(await template.scene)
 
 
-    for i in range(len(new_scenes)):
-      await projectors.open_source_projector(new_scenes[i], monitors[i])
+      await projectors.open_source_projector(new_scenes[-1], monitor)
 
     sleep(5)
 

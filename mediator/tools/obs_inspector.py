@@ -7,6 +7,7 @@ import json
 import logging
 import pathlib
 from mediator.obs_wrapper.general import get_version
+import mediator.obs_wrapper.common as common
 from mediator.obs_wrapper.inputs import get_inputs
 from mediator.obs_wrapper.scene_items import get_scene_items
 
@@ -39,7 +40,19 @@ async def inspect_scene(scene: Scene):
 
     file.write(json.dumps({
       "scene": scene.__dict__,
-      "items": await get_scene_items(scene=scene)
+      "items": await get_scene_items(scene=scene),
+    }, indent=2))
+
+async def inspect_inputs():
+  file_path = str(pathlib.Path(__file__).parent.resolve())+"/outputs/inputs.json"
+  logging.info("Writing input inspection to " + file_path)
+  with open(file_path, 'w') as file:
+    inputs = await get_inputs()
+    dict_inputs = []
+    for input in inputs:
+      dict_inputs.append(await input.__dict__())
+    file.write(json.dumps({
+      "inputs": dict_inputs
     }, indent=2))
 
 
@@ -51,8 +64,10 @@ async def inspect_api():
     file.write(response_json)
 
 async def main():
+  common.connection = common.Connection()
   await inspect_api()
   await inspect()
+  await inspect_inputs()
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())

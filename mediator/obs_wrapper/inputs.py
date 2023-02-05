@@ -1,5 +1,6 @@
 from typing import List, Optional
-from .scenes import Scene
+from .scenes import Scene, get_scene
+from .scene_items import get_scene_item, SceneItem
 from time import sleep
 from enum import Enum
 from . import common
@@ -27,7 +28,7 @@ class InputKind(Enum):
 
 
 class Input(object):
-  data: dict
+  data: dict = {}
 
   def __init__(self, data: dict):
     self.data = data
@@ -37,7 +38,17 @@ class Input(object):
     return self.data["inputName"]
 
   @property
-  def settings(self) -> dict:
+  async def settings(self) -> Optional[dict]:
+    settings = await common.connection.make_request("GetInputSettings", {"inputName": self.name})
+    defaults = await common.connection.make_request("GetDefaultSettings", {"inputKind": self.kind})
+    print(settings,defaults)
+    full_settings = {}
+    if "defaultInputSettings" in defaults:
+      full_settings.update(defaults["defaultInputSettings"])
+
+    if "inputSettings" in settings:
+      full_settings.update(settings["inputSettings"])
+    self.data["inputSettings"] = full_settings
     return self.data["inputSettings"]
 
   @property
@@ -45,22 +56,42 @@ class Input(object):
     return self.data["inputKind"]
 
   @property
+  def sceneItemId(self) -> Optional[int]:
+    if "sceneItemId" in self.data:
+      return self.data["sceneItemId"]
+
+  async def get_scene_item(self) -> Optional[SceneItem]:
+    scene = await get_scene(self.data["sceneName"])
+    if scene:
+      if self.sceneItemId:
+        return await get_scene_item(scene,self.sceneItemId)
+
+  @property
   def __str__(self):
     return "Input: Name: " + self.name
 
+  async def __dict__(self):
+    await self.settings
+    return self.data
+
 async def create_input(name: str, scene: Scene, kind: InputKind, settings: dict) -> Input:
   params = { "inputName": f'{scene.name}-{name}', "sceneName": scene.name, "inputKind": kind.value, "inputSettings": settings}
-  await common.connection.make_request("CreateInput", params)
+  scene_item_id = await common.connection.make_request("CreateInput", params)
+  params.update(scene_item_id)
+  return Input(params)
 
 
-async def get_inputs(kind: Optional[InputKind] = None):
+async def get_inputs(kind: Optional[InputKind] = None) -> List[Input]:
   params = {}
   if kind:
     params["inputKind"] = kind
   response = await common.connection.make_request("GetInputList", params)
 
   if "inputs" in response:
-    return response["inputs"]
+    input_objs = []
+    for input in response["inputs"]:
+      input_objs.append(Input(input))
+    return input_objs
 
   return []
 

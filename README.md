@@ -16,6 +16,15 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## OBS Configuration
+Note settings under `Tools -> WebSocket Server Settings`, put these in `.obs-config.json`. A example `.dist` is provided.
+
+Settings -> General -> Projectors
+- [x] Hide cursor over projectors
+- [x] Make Projectors always on top
+- [ ] Save projectors on Exit
+- [x] Limit to one full-screen projector per screen
+
 ## Tools
 
 Tools can be run by commands like `python3 -m mediator.tools.obs_inspector`.

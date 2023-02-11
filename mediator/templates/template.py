@@ -1,6 +1,5 @@
 from typing import Any, Optional, Dict
 from ..obs_wrapper import scenes
-from syncer import sync
 class Template(object):
   _ready = False
   _scene = None

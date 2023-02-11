@@ -34,6 +34,9 @@ class Demo(Template):
       scene = await scenes.create_scene("Demo "+str(self.display_number), ignore_exists=True)
 
       file_dir=str(pathlib.Path(__file__).parent.resolve()) + "/../../assets/images/"
+      # TODO Improve this
+      if file_dir.startswith("/mnt/c"):
+        file_dir = "C:" + file_dir[6:]
       wallpaper = file_dir + "wallpaper.jpg"
       logo = file_dir + "logo-white.png"
       await inputs.create_input("background"+scene.name, scene, inputs.InputKind.IMAGE, {"file": wallpaper})
@@ -60,25 +63,47 @@ class Demo(Template):
       text = await inputs.create_input("text"+scene.name, scene, inputs.InputKind.TEXT, {
         "text": "Display " + str(self.display_number),
         "font": {
-          "face": "Helvetica",
+          "face": "Arial",
           "flags": 0,
           "size": 250,
           "style": "Regular"
         }
       })
-      source_width = 0
-      while (source_width <= 0):
-        scene_item = await text.get_scene_item()
 
+      if True:
+        source_width = 0
+        while (source_width <= 0):
+          scene_item = await text.get_scene_item()
+
+          if scene_item:
+            transform = scene_item.sceneItemTransform
+            source_width = transform["sourceWidth"]
+            if source_width <= 0:
+              sleep(0.2)
+              continue
+
+            target_width = 1920/3
+            scale_x = target_width / transform["sourceWidth"]
+            await scene_item.set_scene_item_transform(
+              {
+                "positionX": (1920 - target_width)/2,
+                "positionY": 50,
+                "scaleX": scale_x,
+                "scaleY": scale_x
+              }
+            )
+      if False:
+        scene_item = await text.get_scene_item()
         if scene_item:
           transform = scene_item.sceneItemTransform
-          source_width = transform["sourceWidth"]
-          if source_width <= 0:
-            sleep(0.2)
-            continue
 
           target_width = 1920/3
-          scale_x = target_width / transform["sourceWidth"]
+          if transform["sourceWidth"] == 0:
+            # OBS hasn't given us a source width for this media item type :/
+            # TODO possibly scale it later somehow?
+            scale_x = 1
+          else:
+            scale_x = target_width / transform["sourceWidth"]
           await scene_item.set_scene_item_transform(
             {
               "positionX": (1920 - target_width)/2,
@@ -87,8 +112,7 @@ class Demo(Template):
               "scaleY": scale_x
             }
           )
-
-        self._scene = scene
+      self._scene = scene
 
     return self._scene
 

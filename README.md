@@ -5,6 +5,17 @@ Got a screen? Want to put some fancy graphics on it? Want to do that from a nice
 
 # Development
 
+## Windows (via Ubuntu 22.04 WSL)
+See also: https://stackoverflow.com/questions/46610256/chmod-wsl-bash-doesnt-work
+```
+git config --global core.autocrlf true
+sudo apt update && sudo apt upgrade
+sudo apt install python-is-python3 python3-virtualenv
+virtualenv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 ## Tools
 
 Tools can be run by commands like `python3 -m mediator.tools.obs_inspector`.

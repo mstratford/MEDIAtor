@@ -1,33 +1,34 @@
 import asyncio
-from .obs_wrapper import projectors, scenes, inputs
+from .obs_wrapper import projectors, scenes
 from time import sleep
-import pathlib
+from .templates import demo
+from .obs_wrapper import common
 # The MEDIAtor main server.
 
 class MEDIAtor():
   def __init__(self):
     print("Hello! Welcome to MEDIAtor!")
+    common.connection = common.Connection()
+
+  async def delete(self):
+    if common.connection:
+      await common.connection.disconnect()
+
 
   async def do_demo(self):
     monitors = await projectors.get_monitor_list()
+    monitors=monitors[1:2]
+    await scenes.remove_all_scenes()
 
     new_scenes = []
-    for i in range(len(monitors)):
+    for monitor in monitors:
 
-      new_scenes.append(await scenes.create_scene("Demo "+str(i), ignore_exits=True))
+      template = demo.Demo({'name': f"Demo Display {monitor.index}", 'display_number': monitor.index})
 
-    file_dir=str(pathlib.Path(__file__).parent.resolve()) + "/../assets/images/"
-    wallpaper = file_dir + "wallpaper.jpg"
-    logo = file_dir + "logo.png"
-    for scene in new_scenes:
-      await inputs.create_input("background"+scene.name, scene, inputs.InputKind.IMAGE, {"file": wallpaper})
-      await inputs.create_input("logo"+scene.name, scene, inputs.InputKind.IMAGE, {"file": logo})
-      await inputs.create_input("text"+scene.name, scene, inputs.InputKind.TEXT, {"text": "Display " + scene.name})
+      new_scenes.append(await template.scene)
 
-    sceneList = new_scenes #await scenes.get_scene_list()
 
-    for i in range(len(sceneList)):
-      await projectors.open_source_projector(sceneList[i], monitors[i])
+      await projectors.open_source_projector(new_scenes[-1], monitor)
 
     sleep(5)
 
@@ -35,11 +36,13 @@ class MEDIAtor():
       await projectors.close_projector(monitor)
 
     for scene in new_scenes:
-      await scenes.remove_scene(scene)
+      await scene.delete()
+
+    await self.delete()
 
 
 
 media = MEDIAtor()
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 loop.run_until_complete(media.do_demo())

@@ -1,6 +1,5 @@
-from .common import make_request
+from . import common
 
 async def get_version():
-
-  response = await make_request('GetVersion')
+  response = await common.connection.make_request('GetVersion')
   return response

@@ -2,7 +2,7 @@ from .template import Template
 from typing import Optional, Any
 from cerberus import Validator
 from ..obs_wrapper import scenes, inputs
-import pathlib
+from ..utils import storage
 from time import sleep
 
 class Demo(Template):
@@ -33,10 +33,7 @@ class Demo(Template):
 
       scene = await scenes.create_scene("Demo "+str(self.display_number), ignore_exists=True)
 
-      file_dir=str(pathlib.Path(__file__).parent.resolve()) + "/../../assets/images/"
-      # TODO Improve this
-      if file_dir.startswith("/mnt/c"):
-        file_dir = "C:" + file_dir[6:]
+      file_dir=storage.get_relative_obs_filepath("../../assets/images/")
       wallpaper = file_dir + "wallpaper.jpg"
       logo = file_dir + "logo-white.png"
       await inputs.create_input("background"+scene.name, scene, inputs.InputKind.IMAGE, {"file": wallpaper})

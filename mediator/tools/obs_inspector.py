@@ -12,6 +12,7 @@ from mediator.obs_wrapper.inputs import get_inputs
 from mediator.obs_wrapper.scene_items import get_scene_items
 
 from mediator.obs_wrapper.scenes import Scene, get_scene_list, get_scene
+from mediator.utils import storage
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -34,7 +35,8 @@ async def inspect(scene_name = None, item_name = None):
     await inspect_scene(scene)
 
 async def inspect_scene(scene: Scene):
-  file_path = str(pathlib.Path(__file__).parent.resolve())+"/outputs/scene-{}.json".format(scene.name)
+  file_path = storage.get_relative_filepath("tools/outputs/scene-{}.json".format(scene.name))
+
   logging.info("Writing scene inspection to " + file_path)
   with open(file_path, 'w') as file:
 
@@ -69,5 +71,5 @@ async def main():
   await inspect()
   await inspect_inputs()
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 loop.run_until_complete(main())

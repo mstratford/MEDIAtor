@@ -49,6 +49,7 @@ async def get_monitor_list() -> List[Monitor]:
 
 # TODO Return bool
 async def open_source_projector(source: scenes.Scene, monitor: Monitor):
+  print("Creating projector", source.name)
   await common.connection.make_request("OpenSourceProjector", {"sourceName": source.name, "monitorIndex": monitor.index })
 
 

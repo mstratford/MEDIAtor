@@ -4,6 +4,8 @@ from numbers import Number
 from . import common
 from time import sleep
 
+EMPTY_SCENE_NAME = "MEDIAtor Empty Scene"
+
 #{'sceneIndex': 0, 'sceneName': 'Scene 3'}
 class Scene(object):
   data: dict
@@ -70,6 +72,15 @@ async def create_scene(name: str, ignore_exists: bool = False) -> Scene:
   raise Exception("No scene was seen after creating it.")
 
 async def remove_scene(scene_to_remove: Scene):
+  scenes = await get_scene_list()
+  # Can't have 0 scenes, create a blank one.
+  if len(scenes) <= 1:
+    await create_blank_scene()
+
+  # We always need to keep one scene
+  if scene_to_remove.name == EMPTY_SCENE_NAME:
+    return
+
   await common.connection.make_request("RemoveScene", { "sceneName": scene_to_remove.name })
   found = False
   for i in range(4):
@@ -87,11 +98,15 @@ async def remove_scene(scene_to_remove: Scene):
   if found:
     raise Exception("Failed to remove scene, it still exists!")
 
+async def create_blank_scene():
+  print("Create blank scene")
+  await create_scene(EMPTY_SCENE_NAME, ignore_exists=True)
+
 async def remove_all_scenes():
   # You can't have 0 scenes, so create an empty one before removing the rest.
-  await create_scene("Empty", ignore_exists=True)
+  await create_blank_scene()
   scenes = await get_scene_list()
 
   for scene in scenes:
-    if scene.name != "Empty":
+    if scene.name != EMPTY_SCENE_NAME:
       await remove_scene(scene)

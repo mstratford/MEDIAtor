@@ -227,16 +227,16 @@ async def run_websocket_server():
     websocket_server.serve_forever()
 
 
-async def main():
+def main():
 
     media = MEDIAtor()
-    await asyncio.gather(
+    asyncio.run(
         run_websocket_server(),
+        debug=True
     )
 
 
 if __name__ == "__main__":
   logging.getLogger("asyncio").setLevel(logging.DEBUG)
   logging.basicConfig(level=logging.DEBUG)
-  nest_asyncio.apply()
-  asyncio.run(main(), debug=True)
+  main()

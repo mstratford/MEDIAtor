@@ -1,2 +1,3 @@
 cerberus
 simpleobsws
+PySide2

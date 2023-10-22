@@ -31,7 +31,7 @@ class Monitor(object):
     return self.data["monitorName"]
 
   @property
-  def index(self) -> Number:
+  def index(self) -> int:
     return self.data["monitorIndex"]
 
   @property

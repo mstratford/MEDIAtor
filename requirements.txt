@@ -3,3 +3,4 @@ simpleobsws
 simple_websocket_server
 syncer
 nest_asyncio
+websocket-client

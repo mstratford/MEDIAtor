@@ -6,6 +6,7 @@ import inspect
 import nest_asyncio
 from syncer import sync
 import logging
+import re
 
 #Websocket Server
 import asyncio
@@ -186,7 +187,7 @@ class MEDIAtorWebSocketServer(WebSocket):
 
     monitors = await projectors.get_monitor_list()
 
-    await scenes.remove_all_scenes()
+    #await scenes.remove_all_scenes()
 
     new_scenes = []
     for monitor in monitors:
@@ -207,16 +208,63 @@ class MEDIAtorWebSocketServer(WebSocket):
     """Triggers all projectors (screens) to close"""
 
     monitors = await projectors.get_monitor_list()
-    monitors=monitors[1:2]
     for monitor in monitors:
       await projectors.close_projector(monitor)
 
-    for scene in await scenes.get_scene_list():
-      await scene.delete()
+    #for scene in await scenes.get_scene_list():
+    #  await scene.delete()
 
     #await self.delete()
 
     return Response()
+
+  async def command_load_preset(self, data: dict):
+    if not "preset_number" in data:
+      return Response(
+        ResponseStatus.INVALID_DATA
+      )
+    preset_number_to_load = data["preset_number"]
+
+
+    scene_list = await scenes.get_scene_list()
+    monitors = await projectors.get_monitor_list()
+    for scene in scene_list:
+      name = scene.name
+      print(name)
+      index = name.index("~")
+      # Scene has at least a 1 char name and spec
+      # e.g. "Scene Name ~P1D2" for preset 1, display 2
+      if index > 0 and len(name) > index+2:
+        spec = name[index:]
+        print(spec)
+        match = re.search('P(\d+)', spec)
+        preset_number = -1
+        display_number = -1
+        if match:
+            preset_number = int(match.group(1))
+        match = re.search('D(\d+)', spec)
+        if match:
+            display_number = int(match.group(1))
+        if preset_number < 0 or display_number < 0:
+          print("Couldn't find valid spec for P and D")
+
+        if preset_number_to_load == preset_number:
+          for monitor in monitors:
+            if monitor.index == display_number:
+              scene = await scenes.get_scene(name)
+              if scene:
+                await projectors.open_source_projector(scene, monitor)
+        #if not "P" in spec or "D" in spec:
+        #  print("invalid spec: ", spec)
+        #  continue
+
+
+
+    return Response(
+      data={
+        "scenes": scene_list
+      }
+    )
 
 
 ws_clients: List[MEDIAtorWebSocketServer] = []
@@ -227,16 +275,16 @@ async def run_websocket_server():
     websocket_server.serve_forever()
 
 
-def main():
+async def main():
 
     media = MEDIAtor()
-    asyncio.run(
+    await asyncio.gather(
         run_websocket_server(),
-        debug=True
     )
 
 
 if __name__ == "__main__":
   logging.getLogger("asyncio").setLevel(logging.DEBUG)
   logging.basicConfig(level=logging.DEBUG)
-  main()
+  nest_asyncio.apply()
+  asyncio.run(main(), debug=True)
